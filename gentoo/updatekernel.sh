@@ -11,7 +11,10 @@ if [ $# -ne 1 ]; then
 fi
 
 if [ ! -f /boot/grub2/grub.cfg ]; then
-	echo "/boot does not seem to be mounted"
+	echo "/boot/grub2/grub.cfg does not seem to be mounted, trying /boot/grub/grub.cfg"
+## Some systems are using "grub" instead of "grub2"
+if [ ! -f /boot/grub/grub.cfg ]; then
+	echo "Can't find grub.cfg in /boot/grub2/ OR /boot/grub/"
 	exit 1
 fi
 
@@ -63,7 +66,11 @@ fi
 echo "### Updating grub2 config"
 grub2-mkconfig -o /boot/grub2/grub.cfg &>> $LOGFILE
 if [ $? -ne 0 ];then
-	echo "Updating grub2 config failed"
+	echo "'grub2-mkconfig -o /boot/grub2/grub.cfg' failed, trying 'grub-mkconfig -o /boot/grub/grub.cfg' instead."
+## Some systems are using "grub" instead of "grub2".
+grub-mkconfig -o /boot/grub/grub.cfg &>> $LOGFILE
+if [ $? -ne 0 ];then
+	echo "Updating grub config failed"
 	exit 1
 fi
 
